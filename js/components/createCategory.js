@@ -1,4 +1,5 @@
 import { createElement } from "../helper/createElement.js"
+import { declOfNum } from "../helper/declOfNum.js";
 
 /* создание элементов списка категорий
 по аналогии, как с шапкой сайта 
@@ -36,7 +37,7 @@ export const createCategory = (app) => {
 
     const categoryPairs = createElement('span', {
       className: 'category__pairs',
-      textContent: data.length,
+      textContent: declOfNum(data.length, ['пара', 'пары', 'пар']),
     });
 
     cardBtn.append(categoryTitle, categoryPairs);
@@ -60,9 +61,9 @@ export const createCategory = (app) => {
 
   const mount = (data) => {
     categoryList.textContent = '';
-    app.append(category);
     const cards = data.map(createCategoryCard);
     categoryList.append(...cards);
+    app.append(category);
   }
 
   const unmount = () => {
