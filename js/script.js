@@ -1,6 +1,7 @@
 import { createCategory } from "./components/createCategory.js";
 import { createEditCategory } from "./components/createEditCategory.js";
 import { createHeader } from "./components/createHeader.js";
+import { createPairs } from "./components/createPairs.js";
 import { createElement } from "./helper/createElement.js";
 import { fetchCards, fetchCategories } from "./service/apiService.js";
 
@@ -11,10 +12,10 @@ const init = async () => {
   const headerObj = createHeader(headerParent);
   const categoryObj = createCategory(app);
   const editCategoryObj = createEditCategory(app);
+  const pairsObj = createPairs(app);
 
   const allSectionUnmount = () => {
-    categoryObj.unmount();
-    editCategoryObj.unmount();
+    [categoryObj, editCategoryObj, pairsObj].forEach(obj => obj.unmount());
   }
 
 
@@ -57,8 +58,23 @@ const init = async () => {
       allSectionUnmount();
       headerObj.updateHeaderTitle('Редактирование');
       editCategoryObj.mount(dataCards);
+      return;
+    }
+
+    if (target.closest('.category__del')) {
+      console.log('del');
+      return;
+    }
+
+    if (categoryItem) {
+      const dataCards = await fetchCards(categoryItem.dataset.id);
+      allSectionUnmount();
+      headerObj.updateHeaderTitle(dataCards.title);
+      pairsObj.mount(dataCards);
     }
   });
+
+  pairsObj.returnBtn.addEventListener('click', renderIndex);
 }
 
 init();
