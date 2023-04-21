@@ -34,45 +34,49 @@ export const createPairs = (app) => {
   container.append(returnBtn, cardBtn);
   pairs.append(container);
 
-  //логика переворота и смены карточки
-  const cardController = data => {
-    let index = 0;
+  let dataCards = [];
 
-    front.textContent = data[index][0];
-    back.textContent = data[index][1];
+  //логика переворота карточки
+  const flipCard = () => {
+    cardBtn.classList.add('card__item_flipped');
+    cardBtn.removeEventListener('click', flipCard); //убираем обработчик, чтобы исключить случайные 
+    //клики по новым карточкам. позже снова навешиваем.
 
-    const flipCard = () => {
-      cardBtn.classList.add('card__item_flipped');
-      cardBtn.removeEventListener('click', flipCard); //убираем обработчик, чтобы исключить случайные 
-      //клики по новым карточкам. позже снова навешиваем.
-
+    setTimeout(() => {
+      cardBtn.classList.remove('card__item_flipped');
       setTimeout(() => {
-        cardBtn.classList.remove('card__item_flipped');
-        setTimeout(() => {
-          index++;
+        cardBtn.index++;
 
-          if (index === data.length) {
-            front.textContent = 'The end';
-            showAlert('Вернёмся к категориям!');
-
-            setTimeout(() => {
-              returnBtn.click();
-            }, 2000);
-            return;
-          }
-
-          front.textContent = data[index][0];
-          back.textContent = data[index][1];
+        if (cardBtn.index === dataCards.length) {
+          front.textContent = 'The end';
+          showAlert('Вернёмся к категориям!');
 
           setTimeout(() => {
-            cardBtn.addEventListener('click', flipCard);
-          }, 300); //небольшая задержка, чтобы не протыкали карточку сразу случайно.
+            returnBtn.click();
+          }, 2000);
+          return;
+        }
 
-        }, 100); // во вложенном сетТаймауте установили время - 
-        //половину от анимации переворота карточки (CSS). 
-        //чтобы не было видно сменяющегося слова на карточке
-      }, 1500);
-    }
+        front.textContent = dataCards[cardBtn.index][0];
+        back.textContent = dataCards[cardBtn.index][1];
+
+        setTimeout(() => {
+          cardBtn.addEventListener('click', flipCard);
+        }, 300); //небольшая задержка, чтобы не протыкали карточку сразу случайно.
+
+      }, 100); // во вложенном сетТаймауте установили время - 
+      //половину от анимации переворота карточки (CSS). 
+      //чтобы не было видно сменяющегося слова на карточке
+    }, 1500);
+  }
+
+  //логика смены карточки
+  const cardController = data => {
+    dataCards = [...data];
+    cardBtn.index = 0;
+
+    front.textContent = data[cardBtn.index][0];
+    back.textContent = data[cardBtn.index][1];
 
     cardBtn.addEventListener('click', flipCard);
   }
@@ -84,6 +88,7 @@ export const createPairs = (app) => {
 
   const unmount = () => {
     pairs.remove();
+    cardBtn.removeEventListener('click', flipCard);
   }
 
   return { returnBtn, mount, unmount };

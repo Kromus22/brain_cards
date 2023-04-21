@@ -70,13 +70,13 @@ export const createEditCategory = (app) => {
   const createTRCell = (dataArr) => {
     const tr = createElement('tr');
 
-    const tableCellOne = createElement('th', {
+    const tableCellOne = createElement('td', {
       className: 'table__cell table__cell_one',
       textContent: dataArr[0],
       contentEditable: true,
     });
 
-    const tableCellTwo = createElement('th', {
+    const tableCellTwo = createElement('td', {
       className: 'table__cell table__cell_two',
       textContent: dataArr[1],
       contentEditable: true,
@@ -126,6 +126,33 @@ export const createEditCategory = (app) => {
   });
 
 
+  const parseData = () => {
+    const cellsMain = document.querySelectorAll('.table__cell_one');
+    const cellsSecond = document.querySelectorAll('.table__cell_two');
+
+    const data = {
+      pairs: [],
+    }
+
+    for (let i = 0; i < cellsMain.length; i++) {
+      const textMain = cellsMain[i].textContent.trim();
+      const textSecond = cellsSecond[i].textContent.trim()
+      if (textMain && textSecond) {
+        data.pairs.push([textMain, textSecond]);
+      }
+    }
+
+    if (title.textContent.trim() && title.textContent !== TITLE) {
+      data.title = title.textContent.trim();
+    }
+
+    if (saveBtn.dataset.id) {
+      data.id = saveBtn.dataset.id;
+    }
+
+    return data;
+  }
+
   //в моунте открисовываем название категории и заполняем таблицу парами,
   // которые подгружаются, когда мы вызываем это в script
   const mount = (data = { title: TITLE, pairs: [] }) => {
@@ -143,6 +170,8 @@ export const createEditCategory = (app) => {
 
     tbody.append(...rows, emptyRow);
 
+    saveBtn.dataset.id = data.id ? data.id : '';
+
     app.append(editCategory);
   }
 
@@ -150,5 +179,5 @@ export const createEditCategory = (app) => {
     editCategory.remove();
   }
 
-  return { mount, unmount };
+  return { mount, unmount, parseData, saveBtn, cancelBtn };
 }
